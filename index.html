@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="description" content="Klink Snakes - A full-featured snake game with beautiful backgrounds, high scores, and smooth gameplay." />
+<meta name="theme-color" content="#0fa84b">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Klink Snakes" />
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTkyIDE5MiI+PHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0NSIgZmlsbD0iIzBmYTg0YiIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0IDMyKSBzY2FsZSgxLjYpIj48cGF0aCBkPSJNNDAgODBjNDAtNDAgMTIwLTQwIDE2MCAwczQwIDEyMCAwIDE2MC0xMjAgNDAtMTYwIDAtNDAtMTIwIDAtMTYweiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjE2MCIgY3k9IjgwIiByPSIxMCIgZmlsbD0iIzBmYTg0YiIvPjwvZz48L3N2Zz4=" />
+<title>Klink Snakes — Full Background Pack</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  :root{--green:#0fa84b;--green-dark:#0b7a33;--white:#fff}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;background:linear-gradient(180deg,var(--green),var(--green-dark));color:var(--white);display:flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  body{overflow:hidden;position:fixed;width:100%;top:0;left:0;right:0;bottom:0}
+  .app{width:min(1100px,96vw);height:min(95vh,calc(100vh - 20px));display:grid;grid-template-columns:1fr 380px;gap:18px;padding:18px;align-items:start;max-height:100vh}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));border-radius:14px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,0.45);position:relative;overflow:hidden}
+  canvas{width:100%;height:72vh;display:block;border-radius:10px;background:transparent;cursor:pointer;-webkit-touch-callout:none;touch-action:none}
+  .hud{background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:72vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent}
+  .hud::-webkit-scrollbar{width:6px}
+  .hud::-webkit-scrollbar-track{background:transparent}
+  .hud::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
+  .title{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px}
+  .dot{width:12px;height:12px;border-radius:50%;background:var(--white)}
+  .stat{display:flex;justify-content:space-between;font-weight:700;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  button{padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.06);color:var(--white);cursor:pointer;font-weight:700;transition:all .15s ease;-webkit-user-select:none;user-select:none}
+  button:active{transform:scale(0.95);background:rgba(255,255,255,0.12)}
+  button:hover{background:rgba(255,255,255,0.1)}
+  .accent{background:var(--white);color:var(--green-dark);font-weight:900}
+  .accent:hover{background:#f0f0f0}
+  .small{font-size:13px;color:#dfefff;display:block;margin-bottom:6px;font-weight:600}
+  .slider{width:100%;cursor:pointer}
+  select, input[type="range"]{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:var(--white);font-weight:700;cursor:pointer;transition:border-color .15s ease}
+  select:focus, input[type="range"]:focus{outline:none;border-color:rgba(255,255,255,0.3)}
+  .highscores{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;font-size:13px;max-height:180px;overflow-y:auto}
+  .splash{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#0fa84b,#0b7a33);z-index:9999;flex-direction:column;transition:opacity .5s;backdrop-filter:blur(0)}
+  .splash.hidden{opacity:0;pointer-events:none;transform:scale(.98)}
+  .splash h1{color:#fff;font-size:clamp(32px,8vw,64px);margin:0;font-weight:900;letter-spacing:2px;animation:float 2.6s ease-in-out infinite;text-shadow:0 4px 12px rgba(0,0,0,0.3)}
+  .splash p{color:rgba(255,255,255,0.95);margin:12px 0 24px 0;font-weight:600;font-size:clamp(14px,4vw,18px)}
+  .splash-icon{width:120px;height:120px;margin-bottom:20px;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));animation:pulse 2s ease-in-out infinite}
+  @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+  @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+  .overlay{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:9998;display:none;backdrop-filter:blur(4px)}
+  .overlay-card{background:linear-gradient(180deg,#1a1a1a,#2d2d2d);padding:24px;border-radius:16px;color:#fff;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8);max-width:90vw;border:1px solid rgba(255,255,255,0.1)}
+  .overlay-card h2{margin:0 0 12px 0;font-size:24px}
+  .overlay-card p{margin:0 0 16px 0;opacity:0.9}
+  footer{font-size:11px;color:#cfe8ff66;text-align:center;margin-top:12px}
+  @media (max-width:980px){ 
+    .app{grid-template-columns:1fr;gap:12px;padding:12px} 
+    canvas{height:50vh} 
+    .hud{min-height:auto;max-height:40vh}
+    .splash h1{font-size:40px}
+  }
+  @media (max-height:600px){
+    .hud{min-height:auto;max-height:60vh}
+    canvas{height:50vh}
+  }
+</style>
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash" class="splash" role="dialog" aria-label="Klink Snakes splash">
+    <svg class="splash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+      <defs>
+        <linearGradient id="snakeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#f5f5f5;stop-opacity:1" />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <!-- Background circle -->
+      <circle cx="100" cy="100" r="95" fill="#0fa84b"/>
+      <circle cx="100" cy="100" r="90" fill="url(#snakeGrad)" opacity="0.08"/>
+      
+      <!-- Snake body segments -->
+      <g filter="url(#glow)">
+        <!-- Head -->
+        <rect x="75" y="55" width="50" height="50" rx="12" fill="url(#snakeGrad)" stroke="#fff" stroke-width="1.5"/>
+        <!-- Eyes -->
+        <circle cx="85" cy="70" r="5" fill="#0b7a33"/>
+        <circle cx="115" cy="70" r="5" fill="#0b7a33"/>
+        <!-- Body segment 1 -->
+        <rect x="70" y="105" width="50" height="50" rx="10" fill="url(#snakeGrad)" stroke="#fff" stroke-width="1.5" opacity="0.92"/>
+        <!-- Body segment 2 -->
+        <rect x="65" y="155" width="50" height="20" rx="8" fill="url(#snakeGrad)" stroke="#fff" stroke-width="1.5" opacity="0.84"/>
+      </g>
+      
+      <!-- Accent glow -->
+      <circle cx="100" cy="100" r="95" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+    </svg>
+    <h1>Klink Snakes</h1>
+    <p>White snake • Green world</p>
+    <button id="splashStart" class="start-btn" style="padding:14px 32px;border-radius:10px;border:none;background:#fff;color:#0b7a33;font-weight:900;cursor:pointer;font-size:16px;margin-top:10px;">Start Game</button>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" class="app" style="visibility:hidden;opacity:0;transition:opacity .4s ease">
+    <div class="card">
+      <canvas id="gameCanvas" width="900" height="600" tabindex="0" aria-label="Klink Snakes game canvas"></canvas>
+      <div style="position:absolute;left:18px;top:18px;color:var(--white);font-weight:800;font-size:20px;text-shadow:0 2px 8px rgba(0,0,0,0.4);">Klink Snakes</div>
+    </div>
+
+    <aside class="hud card" aria-label="Game controls and statistics">
+      <div class="title"><span class="dot"></span> Klink Snakes</div>
+
+      <div class="stat"><div>Score</div><div id="score" style="font-variant-numeric:tabular-nums">0</div></div>
+      <div class="stat"><div>Level</div><div id="level" style="font-variant-numeric:tabular-nums">1</div></div>
+      <div class="stat"><div>Speed (ms)</div><div id="speedVal" style="font-variant-numeric:tabular-nums">140</div></div>
+
+      <div>
+        <label class="small" for="difficulty">Difficulty</label>
+        <select id="difficulty" aria-label="Game difficulty level">
+          <option value="easy">🟢 Easy</option>
+          <option value="normal" selected>🟡 Normal</option>
+          <option value="hard">🔴 Hard</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="small" for="backgroundSelect">Background</label>
+        <select id="backgroundSelect" aria-label="Background environment">
+          <option value="landscape">🏞️ Landscape</option>
+          <option value="desert">🏜️ Desert</option>
+          <option value="jungle">🌴 Jungle</option>
+          <option value="atlas">⛰️ Atlas Mountain</option>
+          <option value="space">🚀 Space</option>
+          <option value="town">🏘️ Town</option>
+          <option value="moon">🌙 Moon</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="small" for="speedSlider">Speed (ms)</label>
+        <input id="speedSlider" class="slider" type="range" min="60" max="300" step="10" value="140" aria-label="Game speed slider" />
+      </div>
+
+      <div class="controls">
+        <button id="startBtn" class="accent" title="Start a new game (Space to play)">Start</button>
+        <button id="pauseBtn" title="Pause/Resume the game">Pause</button>
+        <button id="resetBtn" title="Reset to initial state">Reset</button>
+        <button id="installBtn" style="display:none;grid-column:1/3" title="Install as app">📱 Install</button>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button id="saveProgress" style="flex:1" title="Save your current progress">💾 Save</button>
+        <button id="loadProgress" style="flex:1" title="Load your saved progress">📂 Load</button>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div style="font-size:13px;color:#cfe8ff;margin-bottom:8px;font-weight:600;">🏆 High Scores</div>
+        <div id="highscoreList" class="highscores" aria-live="polite">No scores yet</div>
+      </div>
+
+      <footer>Designed with ❤️ for smooth play — Klink Snakes PWA</footer>
+    </aside>
+  </div>
+
+  <!-- Game Over Overlay -->
+  <div id="gameOverOverlay" class="overlay" role="dialog" aria-hidden="true" aria-labelledby="gameOverTitle">
+    <div class="overlay-card">
+      <h2 id="gameOverTitle">Game Over</h2>
+      <p id="gameOverMsg">Reason and score will appear here</p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap">
+        <button id="restartBtn" class="accent">Restart</button>
+        <button id="saveScoreBtn">Save Score</button>
+        <button id="closeOverlayBtn">Close</button>
+      </div>
+      <div style="margin-top:12px;font-size:13px;color:#cfe8ff" id="overlayHigh">Top: —</div>
+    </div>
+  </div>
+
+<script>
+/* Klink Snakes - Full PWA Implementation with Professional Icon & Manifest */
+
+/* ========== Service Worker Registration ========== */
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'klink-snakes-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/']).catch(() => {})));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => k !== CACHE ? caches.delete(k) : null))));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.match(e.request).then(r => {
+          if (r) return r;
+          return fetch(e.request).then(resp => {
+            if (!resp || resp.status !== 200) return resp;
+            const c = resp.clone();
+            caches.open(CACHE).then(cache => cache.put(e.request, c));
+            return resp;
+          }).catch(() => caches.match('/'));
+        })
+      );
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+}
+
+/* ========== Web App Manifest ========== */
+const icons = [
+  { src: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTkyIDE5MiI+PHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0NSIgZmlsbD0iIzBmYTg0YiIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0IDMyKSBzY2FsZSgxLjYpIj48cGF0aCBkPSJNNDAgODBjNDAtNDAgMTIwLTQwIDE2MCAwczQwIDEyMCAwIDE2MC0xMjAgNDAtMTYwIDAtNDAtMTIwIDAtMTYweiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjE2MCIgY3k9IjgwIiByPSIxMCIgZmlsbD0iIzBmYTg0YiIvPjwvZz48L3N2Zz4=', sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
+  { src: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSI2NCIgZmlsbD0iIzBmYTg0YiIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDgwIDEyMCkgc2NhbGUoMS4yKSI+PHBhdGggZD0iTTQwIDgwYzQwLTQwIDEyMC00MCAxNjAgMHM0MCAxMjAgMCAxNjAtMTIwIDQwLTE2MCAwLTQwLTEyMCAwLTE2MHoiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSIxNjAiIGN5PSI4MCIgcj0iMTAiIGZpbGw9IiMwZmE4NGIiLz48L2c+PC9zdmc+', sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+];
+
+const manifest = {
+  name: 'Klink Snakes',
+  short_name: 'KlinkSnakes',
+  description: 'A beautiful snake game with multiple backgrounds and high scores',
+  start_url: '/',
+  scope: '/',
+  display: 'standalone',
+  orientation: 'portrait-primary',
+  background_color: '#0fa84b',
+  theme_color: '#0fa84b',
+  categories: ['games'],
+  icons: icons,
+  screenshots: [
+    { src: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1NDAiIGhlaWdodD0iNzIwIiB2aWV3Qm94PSIwIDAgNTQwIDcyMCI+PHJlY3Qgd2lkdGg9IjU0MCIgaGVpZ2h0PSI3MjAiIGZpbGw9IiMwZmE4NGIiLz48dGV4dCB4PSIyNzAiIHk9IjM2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI0OCIgZmlsbD0iI2ZmZiIgZm9udC13ZWlnaHQ9ImJvbGQiPktMSU5LIFJMQU5FUzwvdGV4dD48L3N2Zz4=', sizes: '540x720', form_factor: 'narrow' }
+  ]
+};
+
+const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+const link = document.createElement('link');
+link.rel = 'manifest';
+link.href = URL.createObjectURL(manifestBlob);
+document.head.appendChild(link);
+
+/* ========== Install Prompt ========== */
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBtn').style.display = 'inline-block';
+});
+
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('installBtn').style.display = 'none';
+  }
+});
+
+/* ========== Storage Keys ========== */
+const HS_KEY = 'klink_snakes_hs_v1';
+const PROG_KEY = 'klink_snakes_prog_v1';
+
+/* ========== DOM Elements ========== */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d', { alpha: true });
+const scoreEl = document.getElementById('score');
+const levelEl = document.getElementById('level');
+const speedValEl = document.getElementById('speedVal');
+const speedSlider = document.getElementById('speedSlider');
+const startBtn = document.getElementById('startBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const resetBtn = document.getElementById('resetBtn');
+const difficultySelect = document.getElementById('difficulty');
+const backgroundSelect = document.getElementById('backgroundSelect');
+const splashStartBtn = document.getElementById('splashStart');
+const highscoreListEl = document.getElementById('highscoreList');
+const saveProgressBtn = document.getElementById('saveProgress');
+const loadProgressBtn = document.getElementById('loadProgress');
+const overlayEl = document.getElementById('gameOverOverlay');
+const gameOverMsg = document.getElementById('gameOverMsg');
+const restartBtnEl = document.getElementById('restartBtn');
+const saveScoreBtn = document.getElementById('saveScoreBtn');
+const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+const overlayHigh = document.getElementById('overlayHigh');
+
+/* ========== Game Config ========== */
+let W = canvas.width, H = canvas.height;
+const DIFFICULTY = {
+  easy:   { cols: 18, rows: 12, baseSpeed: 200, obstaclesAuto: false },
+  normal: { cols: 24, rows: 16, baseSpeed: 140, obstaclesAuto: false },
+  hard:   { cols: 30, rows: 20, baseSpeed: 90,  obstaclesAuto: true  }
+};
+
+let cols = DIFFICULTY.normal.cols;
+let rows = DIFFICULTY.normal.rows;
+let cell = Math.min(Math.floor(W / cols), Math.floor(H / rows));
+
+let snake = [];
+let dir = {x:1,y:0}, nextDir = {x:1,y:0};
+let apple = null;
+let obstacles = [];
+let score = 0, level = 1;
+let speedMs = parseInt(speedSlider.value,10);
+let running = false, paused = false;
+let tickTimer = 0, lastTime = 0;
+let confetti = [];
+let celebration = {active:false,t:0};
+let bgIndex = 0;
+
+/* ========== Highscores ========== */
+function loadHighscores(){ try { const raw = localStorage.getItem(HS_KEY); return raw ? JSON.parse(raw) : {}; } catch(e){ return {}; } }
+function saveHighscores(obj){ try { localStorage.setItem(HS_KEY, JSON.stringify(obj)); } catch(e){} }
+function addHighscore(difficulty, name, value){
+  const all = loadHighscores();
+  if(!all[difficulty]) all[difficulty] = [];
+  all[difficulty].push({name: name || 'Player', score: value, date: new Date().toISOString()});
+  all[difficulty].sort((a,b)=>b.score - a.score);
+  all[difficulty] = all[difficulty].slice(0,5);
+  saveHighscores(all);
+  renderHighscores();
+}
+function getHighscores(difficulty){ const all = loadHighscores(); return all[difficulty] || []; }
+function renderHighscores(){
+  const diff = difficultySelect.value;
+  const list = getHighscores(diff);
+  if(list.length === 0){ highscoreListEl.innerHTML = '<div style="opacity:0.8;padding:8px">No scores yet</div>'; return; }
+  highscoreListEl.innerHTML = list.map((s,i)=>`<div style="display:flex;justify-content:space-between;padding:8px;border-radius:6px;background:rgba(255,255,255,0.02);margin-bottom:4px;font-size:12px"><div><strong>${i+1}.</strong> ${s.name}</div><div style="font-weight:700;opacity:0.95">${s.score}</div></div>`).join('');
+}
+
+/* ========== Progression ========== */
+function saveProgression(){
+  const data = { score, level, difficulty: difficultySelect.value, speedMs, snake, dir, apple, obstacles, bgIndex, timestamp: Date.now() };
+  try { localStorage.setItem(PROG_KEY, JSON.stringify(data)); alert('✓ Progress saved'); } catch(e){ alert('✗ Save failed'); }
+}
+function loadProgression(){
+  try {
+    const raw = localStorage.getItem(PROG_KEY);
+    if(!raw) { alert('No saved progress'); return; }
+    const data = JSON.parse(raw);
+    difficultySelect.value = data.difficulty || difficultySelect.value;
+    cols = DIFFICULTY[difficultySelect.value].cols;
+    rows = DIFFICULTY[difficultySelect.value].rows;
+    speedMs = data.speedMs || DIFFICULTY[difficultySelect.value].baseSpeed;
+    speedSlider.value = speedMs;
+    score = data.score || 0;
+    level = data.level || 1;
+    snake = data.snake && data.snake.length ? data.snake : snake;
+    dir = data.dir || dir;
+    nextDir = dir;
+    apple = data.apple || apple;
+    obstacles = data.obstacles || [];
+    bgIndex = data.bgIndex || 0;
+    cell = Math.min(Math.floor(W / cols), Math.floor(H / rows));
+    updateHUD();
+    render();
+    alert('✓ Progress loaded');
+  } catch(e){ alert('✗ Load failed'); }
+}
+
+/* ========== Utilities ========== */
+function randomCellAvoid(){
+  let pos;
+  let attempts = 0;
+  do {
+    pos = { x: Math.floor(Math.random() * cols), y: Math.floor(Math.random() * rows) };
+    attempts++;
+    if(attempts > 500) break;
+  } while (
+    snake.some(s => s.x === pos.x && s.y === pos.y) ||
+    (apple && apple.x === pos.x && apple.y === pos.y) ||
+    obstacles.some(o => o.x === pos.x && o.y === pos.y)
+  );
+  return pos;
+}
+function placeApple(){ apple = randomCellAvoid(); }
+function addObstacle(){ const pos = randomCellAvoid(); if(!pos) return; const cap = Math.floor((cols * rows) * 0.12); if(obstacles.length < cap) obstacles.push(pos); }
+
+/* ========== Game Initialization ========== */
+function resetGame(){
+  cols = DIFFICULTY[difficultySelect.value].cols;
+  rows = DIFFICULTY[difficultySelect.value].rows;
+  speedMs = parseInt(speedSlider.value,10) || DIFFICULTY[difficultySelect.value].baseSpeed;
+  speedSlider.value = speedMs;
+  speedValEl.textContent = speedMs;
+  cell = Math.min(Math.floor(W / cols), Math.floor(H / rows));
+  snake = [];
+  const sx = Math.floor(cols/2), sy = Math.floor(rows*0.75);
+  for(let i=0;i<5;i++) snake.push({x: sx - i, y: sy});
+  dir = {x:1,y:0}; nextDir = {x:1,y:0};
+  score = 0; level = 1; bgIndex = 0; confetti = []; celebration = {active:false,t:0};
+  obstacles = [];
+  placeApple();
+  updateHUD();
+  render();
+}
+resetGame();
+renderHighscores();
+
+/* ========== Input Handling ========== */
+window.addEventListener('keydown', e=>{
+  if(e.key === 'ArrowUp' && dir.y !== 1) nextDir = {x:0,y:-1};
+  if(e.key === 'ArrowDown' && dir.y !== -1) nextDir = {x:0,y:1};
+  if(e.key === 'ArrowLeft' && dir.x !== 1) nextDir = {x:-1,y:0};
+  if(e.key === 'ArrowRight' && dir.x !== -1) nextDir = {x:1,y:0};
+  if(e.key === ' ') { e.preventDefault(); togglePause(); }
+});
+canvas.addEventListener('click', ()=>{ canvas.focus(); if(!running) startGame(); });
+
+startBtn.addEventListener('click', ()=>{ if(!running) startGame(); });
+pauseBtn.addEventListener('click', togglePause);
+resetBtn.addEventListener('click', ()=>{ resetGame(); running=false; paused=false; });
+difficultySelect.addEventListener('change', ()=>{ resetGame(); renderHighscores(); });
+speedSlider.addEventListener('input', ()=>{ speedMs = parseInt(speedSlider.value,10); speedValEl.textContent = speedMs; });
+
+saveProgressBtn.addEventListener('click', saveProgression);
+loadProgressBtn.addEventListener('click', loadProgression);
+
+restartBtnEl.addEventListener('click', ()=>{ overlayEl.style.display = 'none'; resetGame(); startGame(); });
+saveScoreBtn.addEventListener('click', ()=>{
+  const name = (prompt('Enter name (max 12 chars):', 'Player') || 'Player').substring(0,12).trim() || 'Player';
+  addHighscore(difficultySelect.value, name, score);
+  overlayHigh.textContent = `Saved: ${name} — ${score}`;
+});
+closeOverlayBtn.addEventListener('click', ()=>{ overlayEl.style.display = 'none'; });
+
+/* ========== Visuals: Confetti ========== */
+function spawnConfetti(x,y){
+  for(let i=0;i<80;i++){
+    confetti.push({
+      x: x + (Math.random()-0.5)*200,
+      y: y + (Math.random()-0.5)*80,
+      vx: (Math.random()-0.5)*6,
+      vy: -Math.random()*6 - 2,
+      color: `hsl(${Math.random()*360},80%,60%)`,
+      life: 80 + Math.floor(Math.random()*40),
+      size: 3 + Math.random()*5
+    });
+  }
+}
+function updateConfetti(){
+  for(let p of confetti){ p.x += p.vx; p.y += p.vy; p.vy += 0.18; p.life--; }
+  confetti = confetti.filter(p => p.life > 0 && p.y < H + 50);
+}
+function drawConfetti(){ for(let p of confetti){ ctx.fillStyle = p.color; ctx.fillRect(p.x,p.y,p.size,p.size*1.6); } }
+
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+/* ========== Drawing: Snake & Apple ========== */
+function drawAppleAt(cx, cy, size){
+  const radius = size*0.5;
+  const grad = ctx.createRadialGradient(cx - radius*0.25, cy - radius*0.3, radius*0.05, cx, cy, radius);
+  grad.addColorStop(0, '#fff6f6'); grad.addColorStop(0.08, '#ff6b6b'); grad.addColorStop(0.6, '#e33a3a'); grad.addColorStop(1, '#b71c1c');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, radius, radius*0.92, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.fillStyle = 'rgba(255,255,255,0.28)';
+  ctx.beginPath();
+  ctx.ellipse(cx - radius*0.28, cy - radius*0.36, radius*0.36, radius*0.22, -0.5, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.translate(cx + radius*0.45, cy - radius*0.6);
+  ctx.rotate(-0.6);
+  ctx.fillStyle = '#2e7d32';
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.quadraticCurveTo(-radius*0.2, -radius*0.2, -radius*0.6, -radius*0.05);
+  ctx.quadraticCurveTo(-radius*0.2, radius*0.12, 0,0);
+  ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = '#5d4037';
+  ctx.fillRect(cx + radius*0.18, cy - radius*0.78, radius*0.12, radius*0.36);
+}
+
+function drawSegment(x,y,isHead){
+  const cx = x*cell + cell/2;
+  const cy = y*cell + cell/2;
+  const r = cell*0.46;
+  ctx.fillStyle = '#ffffff';
+  roundRect(ctx, cx-r, cy-r, r*2, r*2, r*0.6);
+  ctx.fill();
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  const hg = ctx.createLinearGradient(cx-r, cy-r, cx+r, cy+r);
+  hg.addColorStop(0, 'rgba(255,255,255,0.6)');
+  hg.addColorStop(1, 'rgba(255,255,255,0.06)');
+  ctx.fillStyle = hg;
+  roundRect(ctx, cx-r, cy-r, r*2, r*2, r*0.6);
+  ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, cx-r+0.5, cy-r+0.5, r*2-1, r*2-1, r*0.6);
+  ctx.stroke();
+  if(isHead){
+    ctx.fillStyle = '#0b7a33';
+    const ex = r*0.35, ey = -r*0.12;
+    ctx.beginPath(); ctx.ellipse(cx - ex, cy + ey, r*0.12, r*0.16, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx + ex, cy + ey, r*0.12, r*0.16, 0, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+/* ========== Drawing: Obstacles ========== */
+function drawObstacles(offsetX, offsetY){
+  ctx.save();
+  ctx.fillStyle = 'rgba(40,40,40,0.95)';
+  for(const o of obstacles){
+    const x = offsetX + o.x*cell;
+    const y = offsetY + o.y*cell;
+    roundRect(ctx, x+2, y+2, cell-4, cell-4, 6);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, x+2, y+2, cell-4, cell-4, 6);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* ========== Backgrounds ========== */
+function bg_landscape(t){
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, '#9ad0ff'); g.addColorStop(1, '#cfefff');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  ctx.save(); ctx.translate(Math.sin(t*0.2)*30,0);
+  ctx.fillStyle = '#7aa7d9';
+  ctx.beginPath(); ctx.moveTo(0,H*0.6);
+  for(let x=0;x<=W;x+=30){ const y = H*0.6 - Math.abs(Math.sin((x*0.01 + t*0.2)))*120; ctx.lineTo(x,y); }
+  ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = '#2e8b57';
+  ctx.beginPath(); ctx.moveTo(0,H*0.78);
+  for(let x=0;x<=W;x+=40){ const y = H*0.78 + Math.sin((x*0.008 + t*0.6))*40; ctx.lineTo(x,y); }
+  ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+}
+
+function bg_desert(t){
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, '#ffe6b3'); g.addColorStop(1, '#f6b26b');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = '#f0c27b';
+  ctx.beginPath(); ctx.moveTo(0,H*0.7);
+  for(let x=0;x<=W;x+=30){ const y = H*0.7 + Math.sin((x*0.01 + t*0.4))*60; ctx.lineTo(x,y); }
+  ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(255,230,120,0.95)'; ctx.beginPath(); ctx.arc(W*0.85, H*0.18, 60, 0, Math.PI*2); ctx.fill();
+}
+
+function bg_jungle(t){
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, '#b7f0b7'); g.addColorStop(1, '#0f4d1a');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  const layers = [
+    {color:'#2e7d32', spacing:60, offset: H*0.55, amp:60},
+    {color:'#1b5e20', spacing:80, offset: H*0.65, amp:40}
+  ];
+  for(const L of layers){
+    ctx.fillStyle = L.color;
+    const shift = (t*30) % L.spacing;
+    for(let x = -L.spacing; x < W + L.spacing; x += L.spacing){
+      const px = x + shift;
+      const h = 80 + Math.sin((x + t*40)/120)*20;
+      ctx.beginPath(); ctx.moveTo(px, L.offset + 120); ctx.lineTo(px - 18, L.offset + 120 + h); ctx.lineTo(px + 18, L.offset + 120 + h); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#3b2f2f'; ctx.fillRect(px-4, L.offset + 120 + h, 8, 18); ctx.fillStyle = L.color;
+    }
+  }
+}
+
+function bg_atlas(t){
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, '#cfe6f7'); g.addColorStop(1, '#9fc6e7');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  ctx.save(); ctx.translate(Math.sin(t*0.15)*20,0);
+  ctx.fillStyle = '#6b7fa3';
+  ctx.beginPath(); ctx.moveTo(0,H);
+  for(let x=0;x<=W;x+=20){
+    const nx = x / W;
+    const y = H*0.55 - (Math.abs(Math.sin((nx*12 + t*0.2))) * (H*0.28));
+    ctx.lineTo(x,y);
+  }
+  ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  for(let i=0;i<8;i++){
+    const px = (i/W)*W + (i*60)%W;
+    ctx.beginPath(); ctx.moveTo(60*i, H*0.45); ctx.lineTo(60*i+30, H*0.45-40); ctx.lineTo(60*i+60, H*0.45); ctx.closePath(); ctx.fill();
+  }
+}
+
+function bg_space(t){
+  ctx.fillStyle = '#02030a'; ctx.fillRect(0,0,W,H);
+  for(let i=0;i<120;i++){
+    const x = (i*73 + (t*40)) % W;
+    const y = (Math.sin((i+t)*0.5)*30 + (t*20)) % H;
+    ctx.fillStyle = 'rgba(255,255,255,' + (0.6 + (i%3)*0.12) + ')';
+    ctx.fillRect(x, y, 1 + (i%3), 1 + (i%3));
+  }
+  const ng = ctx.createRadialGradient(W*0.3, H*0.4, 10, W*0.3, H*0.4, 400);
+  ng.addColorStop(0, 'rgba(120,80,200,0.28)'); ng.addColorStop(0.4, 'rgba(80,160,220,0.12)'); ng.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = ng; ctx.fillRect(0,0,W,H);
+  ctx.beginPath(); ctx.fillStyle = '#2b6fb3'; ctx.arc(W*0.82, H*0.22, 60, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.beginPath(); ctx.arc(W*0.82+20, H*0.22-10, 60, 0, Math.PI*2); ctx.fill();
+}
+
+function bg_town(t){
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, '#7fb6ff'); g.addColorStop(1, '#2b3b5a');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = '#1f2b3a';
+  const base = H*0.7;
+  for(let i=0;i<12;i++){
+    const w = 40 + (i%3)*20;
+    const h = 80 + ((i*37)%200);
+    const x = i * (W/12);
+    ctx.fillRect(x, base - h, w, h);
+    ctx.fillStyle = 'rgba(255,230,120,0.9)';
+    for(let y=base-h+10;y<base-10;y+=24){
+      for(let wx=10; wx<w-10; wx+=20){
+        if(Math.random() > 0.6) ctx.fillRect(x+wx, y, 8, 12);
+      }
+    }
+    ctx.fillStyle = '#1f2b3a';
+  }
+}
+
+function bg_moon(t){
+  ctx.fillStyle = '#05061a'; ctx.fillRect(0,0,W,H);
+  for(let i=0;i<80;i++){
+    const x = (i*97 + (t*30)) % W;
+    const y = (Math.sin((i+t)*0.6)*40 + (t*10)) % H;
+    ctx.fillStyle = 'rgba(255,255,255,' + (0.5 + (i%4)*0.08) + ')';
+    ctx.fillRect(x, y, 1 + (i%2), 1 + (i%2));
+  }
+  ctx.beginPath(); ctx.fillStyle = '#2b6fb3'; ctx.arc(W*0.78, H*0.22, 60, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(34,139,34,0.12)'; ctx.beginPath(); ctx.arc(W*0.78-10, H*0.22+8, 60, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#bfbfbf';
+  ctx.beginPath(); ctx.moveTo(0,H*0.7);
+  for(let x=0;x<=W;x+=30){ const y = H*0.7 + Math.sin((x*0.02 + t*0.4))*18 + (Math.cos(x*0.03)*8); ctx.lineTo(x,y); }
+  ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#9f9f9f';
+  for(let i=0;i<12;i++){
+    const cx = (i*73 + (t*20)) % W;
+    const cy = H*0.7 + 10 + (i%5)*6;
+    const r = 6 + (i%4)*4;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+function drawBackground(mode, t){
+  switch(mode){
+    case 'landscape': bg_landscape(t); break;
+    case 'desert': bg_desert(t); break;
+    case 'jungle': bg_jungle(t); break;
+    case 'atlas': bg_atlas(t); break;
+    case 'space': bg_space(t); break;
+    case 'town': bg_town(t); break;
+    case 'moon': bg_moon(t); break;
+    default: bg_landscape(t);
+  }
+}
+
+/* ========== Celebration ========== */
+function drawCelebration(t){
+  if(!celebration.active) return;
+  const alpha = Math.max(0, 1 - celebration.t/120);
+  const head = snake[0];
+  const cx = head.x*cell + cell/2;
+  const cy = head.y*cell + cell/2;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = 'rgba(255,215,0,0.9)';
+  ctx.beginPath();
+  ctx.arc(cx, cy - 40 - Math.sin(celebration.t*0.15)*8, 12 + Math.sin(celebration.t*0.2)*4, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+  celebration.t++;
+  if(celebration.t > 140) celebration.active = false;
+}
+
+/* ========== Render ========== */
+function render(now){
+  const t = (now || performance.now()) / 1000;
+  const selectedBg = backgroundSelect.value || 'landscape';
+  drawBackground(selectedBg, t);
+  const gridW = cols * cell;
+  const gridH = rows * cell;
+  const offsetX = (W - gridW) / 2;
+  const offsetY = (H - gridH) / 2;
+  ctx.save();
+  ctx.translate(offsetX, offsetY);
+  ctx.fillStyle = 'rgba(0,0,0,0.02)';
+  ctx.fillRect(0,0,gridW,gridH);
+  if(apple) drawAppleAt(apple.x*cell + cell/2, apple.y*cell + cell/2, cell*0.9);
+  drawObstacles(offsetX, offsetY);
+  for(let i = snake.length - 1; i >= 0; i--){
+    const s = snake[i];
+    drawSegment(s.x, s.y, i === 0);
+  }
+  ctx.restore();
+  drawConfetti();
+  drawCelebration();
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  ctx.fillRect(12,12,260,64);
+  ctx.fillStyle = '#fff';
+  ctx.font = '600 14px Inter, -apple-system, Arial';
+  ctx.fillText(`Score: ${score}`, 24, 34);
+  ctx.fillText(`Level: ${level}`, 24, 54);
+  ctx.restore();
+}
+
+/* ========== Game Logic ========== */
+function step(){
+  dir = nextDir;
+  const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+  if(head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows){
+    running = false; playGameOver(); showGameOverOverlay('Hit the wall!', score); return;
+  }
+  if(snake.some(s => s.x === head.x && s.y === head.y)){
+    running = false; playGameOver(); showGameOverOverlay('Bit yourself!', score); return;
+  }
+  if(obstacles.some(o => o.x === head.x && o.y === head.y)){
+    running = false; playGameOver(); showGameOverOverlay('Hit obstacle!', score); return;
+  }
+
+  snake.unshift(head);
+
+  if(apple && head.x === apple.x && head.y === apple.y){
+    score += 1; playEat();
+    if(score % 5 === 0){
+      level = Math.floor(score / 5) + 1;
+      playMilestone();
+      spawnConfetti(W/2, H/2);
+      celebration.active = true; celebration.t = 0;
+      if(DIFFICULTY[difficultySelect.value].obstaclesAuto) addObstacle();
+      const list = ['landscape','desert','jungle','atlas','space','town','moon'];
+      bgIndex = (bgIndex + 1) % list.length;
+      backgroundSelect.value = list[bgIndex];
+    }
+    placeApple();
+  } else {
+    snake.pop();
+  }
+  updateHUD();
+}
+
+function showGameOverOverlay(title, score){
+  document.getElementById('gameOverTitle').textContent = 'Game Over';
+  gameOverMsg.textContent = `${title} — Final score: ${score}`;
+  overlayEl.style.display = 'flex';
+  const hs = getHighscores(difficultySelect.value);
+  overlayHigh.textContent = hs.length ? `🏆 Top: ${hs[0].name} — ${hs[0].score}` : 'No high scores yet';
+  renderHighscores();
+}
+
+/* ========== Audio ========== */
+function playBeep(freq, dur=0.12, vol=0.12, type='sine'){
+  try {
+    const a = new (window.AudioContext || window.webkitAudioContext)();
+    const o = a.createOscillator();
+    const g = a.createGain();
+    o.type = type; o.frequency.value = freq; g.gain.value = vol;
+    o.connect(g); g.connect(a.destination);
+    o.start(); o.stop(a.currentTime + dur);
+  } catch(e){}
+}
+function playEat(){ playBeep(1200,0.08,0.12,'sine'); }
+function playMilestone(){ playBeep(880,0.18,0.18,'triangle'); playBeep(1320,0.12,0.12,'sine'); }
+function playGameOver(){ playBeep(160,0.5,0.18,'sawtooth'); }
+
+/* ========== Loop ========== */
+function loop(now){
+  if(!running || paused) return;
+  const dt = (now - lastTime) / 1000;
+  lastTime = now;
+  tickTimer += dt;
+  const interval = speedMs / 1000;
+  if(tickTimer >= interval){
+    tickTimer -= interval;
+    step();
+  }
+  updateConfetti();
+  render(now);
+  requestAnimationFrame(loop);
+}
+
+function startGame(){ if(!running){ running = true; paused = false; lastTime = performance.now(); tickTimer = 0; requestAnimationFrame(loop); } }
+function togglePause(){ if(!running) return; paused = !paused; if(!paused){ lastTime = performance.now(); requestAnimationFrame(loop); } }
+
+function updateHUD(){ scoreEl.textContent = score; levelEl.textContent = level; speedValEl.textContent = speedMs; }
+
+/* ========== Splash ========== */
+splashStartBtn.addEventListener('click', () => {
+  document.getElementById('splash').classList.add('hidden');
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('app').style.visibility = 'visible';
+    document.getElementById('app').style.opacity = '1';
+    canvas.focus();
+    startGame();
+  }, 500);
+});
+
+/* ========== Resize ========== */
+function resize(){
+  W = canvas.width = Math.max(720, Math.floor(window.innerWidth * 0.6));
+  H = canvas.height = Math.max(480, Math.floor(window.innerHeight * 0.6));
+  cell = Math.min(Math.floor(W / cols), Math.floor(H / rows));
+  render();
+}
+window.addEventListener('resize', resize);
+resize();
+updateHUD();
+render();
+renderHighscores();
+</script>
+</body>
+</html>
